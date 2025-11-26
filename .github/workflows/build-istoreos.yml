@@ -94,8 +94,6 @@ jobs:
         df -hT $PWD
         git clone $REPO_URL -b ${{ matrix.REPO_BRANCH }} openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-        cd openwrt
-        git submodule update --init --recursive  # 关键：初始化并拉取 OpenWRT 依赖的子模块（缺失会导致 Makefile 无效）
 
     - name: 缓存构建动作
       uses: klever1988/cachewrtbuild@main
@@ -128,14 +126,6 @@ jobs:
         chmod +x $DIY_P2_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
-        
-    - name: Configure kernel with Chelsio driver enabled
-      run: |
-        make defconfig
-        echo "CONFIG_CRYPTO_DEV_CHELSIO=m" > chelsio_config.cfg
-        ./scripts/kconfig/merge_config.sh .config chelsio_config.cfg
-        make olddefconfig
-        grep CONFIG_CRYPTO_DEV_CHELSIO .config
 
     - name: SSH 连接到 Actions
       uses: P3TERX/ssh2actions@v1.0.0
